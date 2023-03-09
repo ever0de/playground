@@ -3,28 +3,29 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 
 	example "github.com/ever0de/playground/proto-quic/proto"
 	"github.com/golang/protobuf/proto"
 	quic "github.com/quic-go/quic-go"
 )
 
-func NewServer() {
+func NewServer(addr string) {
 	// Start the QUIC server
-	listener, err := quic.ListenAddr("localhost:4242", GenerateTLSConfig(), nil)
+	listener, err := quic.ListenAddr(addr, GenerateTLSConfig(), nil)
 	if err != nil {
 		panic(err)
 	}
 
 	// Wait for a client to connect
-	session, err := listener.Accept(context.Background())
+	conn, err := listener.Accept(context.Background())
 	println("server)accept")
 	if err != nil {
 		panic(err)
 	}
 
 	// Open a stream for sending and receiving messages
-	stream, err := session.AcceptStream(context.Background())
+	stream, err := conn.AcceptStream(context.Background())
 	println("server)accept stream")
 	if err != nil {
 		panic(err)
@@ -42,15 +43,19 @@ func NewServer() {
 	if err != nil {
 		panic(err)
 	}
-
-	// Receive a protobuf message
-	buffer := make([]byte, 1024)
-	n, err := stream.Read(buffer)
+	err = stream.Close()
 	if err != nil {
 		panic(err)
 	}
+
+	// Receive a protobuf message
+	buf, err := io.ReadAll(stream)
+	if err != nil {
+		panic(err)
+	}
+
 	receivedMessage := &example.Message{}
-	err = proto.Unmarshal(buffer[:n], receivedMessage)
+	err = proto.Unmarshal(buf, receivedMessage)
 	if err != nil {
 		panic(err)
 	}

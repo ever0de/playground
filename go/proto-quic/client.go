@@ -1,18 +1,18 @@
 package main
 
 import (
-	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
 
 	example "github.com/ever0de/playground/proto-quic/proto"
+	"github.com/golang/protobuf/proto"
 	quic "github.com/quic-go/quic-go"
-	"google.golang.org/protobuf/proto"
 )
 
-func NewClient() {
+func NewClient(addr string) {
 	// Connect to the QUIC server
-	session, err := quic.DialAddr("localhost:4242", &tls.Config{
+	conn, err := quic.DialAddr(addr, &tls.Config{
 		InsecureSkipVerify: true,
 		NextProtos:         []string{"quic-echo-example"},
 	}, nil)
@@ -22,7 +22,7 @@ func NewClient() {
 	}
 
 	// Open a stream for sending and receiving messages
-	stream, err := session.OpenStreamSync(context.Background())
+	stream, err := conn.OpenStream()
 	println("client)open stream")
 	if err != nil {
 		panic(err)
@@ -40,15 +40,18 @@ func NewClient() {
 	if err != nil {
 		panic(err)
 	}
+	err = stream.Close()
+	if err != nil {
+		panic(err)
+	}
 
 	// Receive a protobuf message
-	buffer := make([]byte, 1024)
-	n, err := stream.Read(buffer)
+	buf, err := io.ReadAll(stream)
 	if err != nil {
 		panic(err)
 	}
 	receivedMessage := &example.Message{}
-	err = proto.Unmarshal(buffer[:n], receivedMessage)
+	err = proto.Unmarshal(buf, receivedMessage)
 	if err != nil {
 		panic(err)
 	}
