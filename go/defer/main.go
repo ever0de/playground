@@ -1,6 +1,8 @@
 package main
 
 func main() {
+	earlyReturn()
+
 	getFunc(func() {
 		println("callback func")
 
@@ -18,4 +20,14 @@ func getFunc(callback func()) {
 	}()
 
 	callback()
+}
+
+func earlyReturn() {
+	if true {
+		return
+	}
+
+	defer func() {
+		println("earlyReturn defer")
+	}()
 }
