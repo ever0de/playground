@@ -1,10 +1,12 @@
 #[test]
 fn let_else() {
-    struct Value(i32);
+    enum Value {
+        Integer(i32),
+    }
 
-    let options = Some(Value(1));
+    let options = Some(Value::Integer(1));
 
-    let Value(value) = options else {
+    let Some(Value::Integer(_)) = options else {
         return;
     };
 }
