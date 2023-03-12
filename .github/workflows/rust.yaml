@@ -1,0 +1,36 @@
+name: Rust
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  stable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: |
+          cd rust/stable
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
+          cargo fmt -- --check
+          cargo build --workspace --all-features --all-targets --verbose
+          cargo test --workspace --all-features --all-targets --verbose
+
+  nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: |
+          cd rust/nightly
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
+          cargo fmt -- --check
+          cargo build --workspace --all-features --all-targets --verbose
+          cargo test --workspace --all-features --all-targets --verbose
