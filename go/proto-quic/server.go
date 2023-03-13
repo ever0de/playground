@@ -6,8 +6,8 @@ import (
 	"io"
 
 	example "github.com/ever0de/playground/proto-quic/proto"
-	"github.com/golang/protobuf/proto"
 	quic "github.com/quic-go/quic-go"
+	"google.golang.org/protobuf/proto"
 )
 
 func NewServer(addr string) {

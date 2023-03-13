@@ -40,5 +40,5 @@ require (
 	github.com/quic-go/quic-go v0.33.0
 	golang.org/x/exp v0.0.0-20221205204356-47842c84f3db // indirect
 	golang.org/x/sys v0.3.0 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.0
 )
