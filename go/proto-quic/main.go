@@ -1,21 +1,23 @@
 package main
 
-import "sync"
+import (
+	"sync"
+)
 
 func main() {
 	addr := "localhost:4242"
 
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(1)
 
 	go func() {
-		NewClient(addr)
+		NewClientStream(addr)
 		wg.Done()
+		defer println("done client")
 	}()
 
 	go func() {
-		NewServer(addr)
-		wg.Done()
+		NewServerStream(addr)
 	}()
 
 	wg.Wait()

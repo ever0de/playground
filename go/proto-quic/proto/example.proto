@@ -2,8 +2,48 @@ syntax = "proto3";
 
 package example;
 
-option go_package = "github.com/ever0de/playground/proto";
+import "google/protobuf/timestamp.proto";
+option go_package = "github.com/ever0de/playground/proto/example";
 
-message Message {
-  string body = 1;
+message Get {
+  bytes key = 1;
+}
+
+message GetResponse {
+  uint64 request_id = 1;
+  bool success = 2;
+  bytes key = 3;
+  bytes value = 4;
+}
+
+message Set {
+  bytes key = 1;
+  bytes value = 2;
+}
+
+message SetResponse {
+  uint64 request_id = 1;
+  bool success = 2;
+}
+
+enum OpType {
+  OpGet = 0;
+  OpGetResponse = 1;
+
+  OpSet = 2;
+  OpSetResponse = 3;
+}
+
+message Operation {
+  OpType type = 1;
+  google.protobuf.Timestamp last_updated = 2;
+
+  oneof payload {
+    Get get = 3;
+    GetResponse get_response = 4;
+
+    Set set = 5;
+    SetResponse set_response = 6;
+  }
+
 }
