@@ -7,6 +7,6 @@ fn let_else() {
     let options = Some(Value::Integer(1));
 
     let Some(Value::Integer(_)) = options else {
-        return;
+        panic!("expected an integer");
     };
 }
