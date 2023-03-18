@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func main() {
 	earlyReturn()
 
@@ -12,6 +14,16 @@ func main() {
 	})
 
 	println("main defer")
+	println("=======================")
+
+	for i := 0; i < 3; i++ {
+		j := i
+		defer func() {
+			fmt.Printf("loop defer: %d\n", j)
+		}()
+	}
+
+	println("loop defer")
 }
 
 func getFunc(callback func()) {
