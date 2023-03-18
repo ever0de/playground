@@ -1,12 +1,12 @@
 use macros::bind;
 
 #[bind]
-enum Temp {}
+pub enum Temp {}
 
 #[bind]
 impl Temp {
-    #[bind]
-    fn temp() -> u32 {
+    // #[bind]
+    pub fn temp() -> u32 {
         42
     }
 }

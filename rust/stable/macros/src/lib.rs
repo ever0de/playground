@@ -12,11 +12,11 @@ pub fn bind(item: TokenStream, attr: TokenStream) -> TokenStream {
     let attr = parse_macro_input!(attr as Item);
     println!("{attr:#?}");
 
-    match attr {
+    match &attr {
         Item::Impl(attr) => {
             println!("impl:\n{attr:#?}");
 
-            let Type::Path(self_ty) = *attr.self_ty else {
+            let Type::Path(self_ty) = &*attr.self_ty else {
                 return quote! {
                     compile_error!("unsupported `impl Type`");
                 }
@@ -32,15 +32,18 @@ pub fn bind(item: TokenStream, attr: TokenStream) -> TokenStream {
             println!("enum:\n{attr:#?}");
         }
         _ => {
+            println!("other:\n{attr:#?}");
+
             return quote! {
                 compile_error!("unsupported item");
             }
-            .into()
+            .into();
         }
     };
 
     let token = quote! {
         // fn answer() -> u32 { 42 }
+        #attr
     };
 
     println!("output: {}\n", token);
