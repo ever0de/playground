@@ -1,7 +1,6 @@
-package main
+package bloomfilter
 
 import (
-	"fmt"
 	"hash"
 	"hash/fnv"
 
@@ -65,13 +64,13 @@ func (bf *BloomFilter) Contains(element []byte) bool {
 	return true
 }
 
-func main() {
-	bf := NewBloomFilter(100, 3)
-	bf.Add([]byte("hello"))
-	bf.Add([]byte("world"))
-	fmt.Println(bf.Contains([]byte("hello"))) // true
-	fmt.Println(bf.Contains([]byte("world"))) // true
-	bf.Delete([]byte("hello"))
-	fmt.Println(bf.Contains([]byte("hello"))) // false
-	fmt.Println(bf.Contains([]byte("world"))) // true
-}
+// func main() {
+// 	bf := NewBloomFilter(100, 3)
+// 	bf.Add([]byte("hello"))
+// 	bf.Add([]byte("world"))
+// 	fmt.Println(bf.Contains([]byte("hello"))) // true
+// 	fmt.Println(bf.Contains([]byte("world"))) // true
+// 	bf.Delete([]byte("hello"))
+// 	fmt.Println(bf.Contains([]byte("hello"))) // false
+// 	fmt.Println(bf.Contains([]byte("world"))) // true
+// }
