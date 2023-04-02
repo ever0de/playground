@@ -6,3 +6,9 @@ fn block_on_panic() {
     use futures::executor::block_on;
     block_on(async { block_on(async {}) })
 }
+
+#[test]
+fn block_on() {
+    use smol::block_on;
+    block_on(async { block_on(async {}) });
+}
