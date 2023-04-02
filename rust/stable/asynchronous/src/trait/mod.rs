@@ -1,3 +1,5 @@
+pub mod async_trait;
+
 use std::{future::Future, pin::Pin};
 
 pub trait Constructor {
