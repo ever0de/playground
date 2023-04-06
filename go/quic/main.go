@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/quic-go/quic-go"
@@ -20,26 +21,32 @@ const (
 var (
 	serverUDPAddr = &net.UDPAddr{
 		IP:   net.IPv4(127, 0, 0, 1),
-		Port: 8080,
+		Port: 4242,
 	}
 
 	clientUDPAddr = &net.UDPAddr{
 		IP:   net.IPv4(127, 0, 0, 1),
-		Port: 8081,
+		Port: 4241,
 	}
 )
 
 func main() {
+	closeChan := make(chan struct{})
+	var wg sync.WaitGroup
+
 	log("global", "udp")
 	{
-		go serverUDP()
-		clientUDP()
+		wg.Add(1)
+		go func() { serverUDP(closeChan); wg.Done() }()
+		clientUDP(closeChan)
+		wg.Wait()
 	}
 
+	println("\n\n\n\n")
 	log("global", "direct quic")
 	{
-		go serverQuic()
-		clientQuic()
+		go serverQuic(closeChan)
+		clientQuic(closeChan)
 	}
 }
 
@@ -71,7 +78,7 @@ var (
 	}
 )
 
-func serverUDP() {
+func serverUDP(closeChan chan struct{}) {
 	conn := getUDPConn(serverUDPAddr)
 	quicListener, err := quic.ListenEarly(
 		conn,
@@ -83,10 +90,18 @@ func serverUDP() {
 	}
 	log(s, "create quic server")
 
-	server(quicListener)
+	go server(quicListener)
+
+	<-closeChan
+	if err := quicListener.Close(); err != nil {
+		panic(err)
+	}
+	if err := conn.Close(); err != nil {
+		panic(err)
+	}
 }
 
-func serverQuic() {
+func serverQuic(closeChan chan struct{}) {
 	quicListener, err := quic.ListenAddrEarly(
 		serverUDPAddr.String(),
 		GenerateServerTLSConfig(),
@@ -97,10 +112,14 @@ func serverQuic() {
 	}
 	log(s, "create quic server")
 
-	server(quicListener)
+	go server(quicListener)
+	<-closeChan
+	if err := quicListener.Close(); err != nil {
+		panic(err)
+	}
 }
 
-func clientUDP() {
+func clientUDP(closeChan chan struct{}) {
 	conn := getUDPConn(clientUDPAddr)
 
 	now := time.Now()
@@ -117,6 +136,9 @@ func clientUDP() {
 		}
 		log(c, fmt.Sprintf("open stream failed: %v\ttimeout error: %v", err, errorIsIdleTimeout(err)))
 		fmt.Printf("time cost: %v\n", time.Since(now))
+		if err := quicConn.CloseWithError(99999, "quic client close"); err != nil {
+			panic(err)
+		}
 	}
 
 	// reconnect
@@ -151,10 +173,18 @@ func clientUDP() {
 		if err != nil {
 			panic(err)
 		}
+		if err := quicConn.CloseWithError(99999, "quic client close"); err != nil {
+			panic(err)
+		}
+	}
+
+	closeChan <- struct{}{}
+	if err := conn.Close(); err != nil {
+		panic(err)
 	}
 }
 
-func clientQuic() {
+func clientQuic(closeChan chan struct{}) {
 	dial := func() quic.Connection {
 		conn, err := quic.DialAddrEarly(
 			serverUDPAddr.String(),
@@ -181,6 +211,9 @@ func clientQuic() {
 		}
 		log(c, fmt.Sprintf("open stream failed: %v\ttimeout error: %v", err, errorIsIdleTimeout(err)))
 		fmt.Printf("time cost: %v\n", time.Since(now))
+		if err := conn.CloseWithError(99999, "quic client close"); err != nil {
+			panic(err)
+		}
 	}
 
 	// reconnect
@@ -214,7 +247,12 @@ func clientQuic() {
 		if err != nil {
 			panic(err)
 		}
+		if err := conn.CloseWithError(99999, "quic client close"); err != nil {
+			panic(err)
+		}
 	}
+
+	closeChan <- struct{}{}
 }
 
 func listen(conn quic.Connection) {
