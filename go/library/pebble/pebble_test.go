@@ -1,13 +1,14 @@
-package main
+package pebble_test
 
 import (
 	"fmt"
 	"log"
+	"testing"
 
 	"github.com/cockroachdb/pebble"
 )
 
-func main() {
+func TestPebble(t *testing.T) {
 	db, err := pebble.Open("./tmp", &pebble.Options{
 		Levels: []pebble.LevelOptions{
 			{TargetFileSize: 1 << 20},
@@ -49,5 +50,4 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-
 }
