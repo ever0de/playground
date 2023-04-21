@@ -1,6 +1,6 @@
 module github.com/ever0de/playground
 
-go 1.19
+go 1.20
 
 require (
 	github.com/bits-and-blooms/bitset v1.5.0
@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/bufbuild/connect-go v1.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
@@ -52,5 +53,5 @@ require (
 	github.com/quic-go/quic-go v0.33.0
 	golang.org/x/exp v0.0.0-20221205204356-47842c84f3db // indirect
 	golang.org/x/sys v0.7.0 // indirect
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.28.1
 )

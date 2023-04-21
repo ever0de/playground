@@ -120,12 +120,16 @@ func serverQuic(closeChan chan struct{}) {
 }
 
 func clientUDP(closeChan chan struct{}) {
-	conn := getUDPConn(clientUDPAddr)
+	type UDPConn struct {
+		conn *net.UDPConn
+	}
 
+	conn := getUDPConn(clientUDPAddr)
+	uc := &UDPConn{conn}
 	now := time.Now()
 	// timeout
 	{
-		quicConn := quicDial(conn)
+		quicConn := quicDial(uc.conn)
 		log(c, "create quic client")
 		time.Sleep(timeoutDuration * 2)
 
@@ -139,11 +143,16 @@ func clientUDP(closeChan chan struct{}) {
 		if err := quicConn.CloseWithError(99999, "quic client close"); err != nil {
 			panic(err)
 		}
+		if err := uc.conn.Close(); err != nil {
+			panic(err)
+		}
 	}
 
 	// reconnect
 	{
-		quicConn := quicDial(conn)
+		conn := getUDPConn(clientUDPAddr)
+		uc.conn = conn
+		quicConn := quicDial(uc.conn)
 
 		ctx := context.Background()
 		stream, err := quicConn.OpenStreamSync(ctx)
@@ -176,12 +185,13 @@ func clientUDP(closeChan chan struct{}) {
 		if err := quicConn.CloseWithError(99999, "quic client close"); err != nil {
 			panic(err)
 		}
+
+		if err := uc.conn.Close(); err != nil {
+			panic(err)
+		}
 	}
 
 	closeChan <- struct{}{}
-	if err := conn.Close(); err != nil {
-		panic(err)
-	}
 }
 
 func clientQuic(closeChan chan struct{}) {
