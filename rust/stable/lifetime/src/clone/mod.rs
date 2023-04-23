@@ -13,6 +13,7 @@ pub enum Value {
 }
 
 impl Value {
+    #[allow(clippy::result_unit_err)]
     pub fn try_from_literal(data_type: &DataType, literal: &Literal) -> Result<Self, ()> {
         match (data_type, literal) {
             (DataType::Text, Literal::Text(value)) => Ok(Value::Text(value.to_string())),

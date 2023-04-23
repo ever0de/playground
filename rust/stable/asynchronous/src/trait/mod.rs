@@ -28,6 +28,7 @@ impl<'a> Temp<'a> {
     // Self -> don't work
     // `impl Trait` return type cannot contain a projection or `Self` that references lifetimes from a parent scope
     // see issue #103532 <https://github.com/rust-lang/rust/issues/103532> for more information
+    #[allow(clippy::manual_async_fn)]
     fn new(inner: &'a i64) -> impl Future<Output = Temp<'a>> {
         async move { Self { inner } }
     }
