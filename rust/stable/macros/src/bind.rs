@@ -1,8 +1,8 @@
 pub mod item;
 
 use proc_macro::TokenStream;
-use quote::quote;
-use syn::{parse_macro_input, Item};
+use quote::quote_spanned;
+use syn::{parse_macro_input, spanned::Spanned, Item};
 
 use crate::bind::item::{item_enum, item_impl, item_struct};
 
@@ -10,14 +10,18 @@ use crate::bind::item::{item_enum, item_impl, item_struct};
 //
 // impl Temp { #[bind] fn temp() -> u32 { 42 } }
 pub fn bind(_item: TokenStream, attr: TokenStream) -> TokenStream {
-    let attr = parse_macro_input!(attr as Item);
+    let item = parse_macro_input!(attr as Item);
 
-    match &attr {
+    match &item {
         Item::Impl(attr) => item_impl(attr),
         Item::Struct(attr) => item_struct(attr),
         Item::Enum(attr) => item_enum(attr),
-        _ => quote! {
-            compile_error!("unsupported item");
+        // TODO:
+        // Item::Fn(attr) => {
+        //     quote! {}.into()
+        // }
+        _ => quote_spanned! {item.span()=>
+            compile_error!("`#[bind]` can only be used on `impl`, `struct`, `enum` or `fn`");
         }
         .into(),
     }
