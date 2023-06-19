@@ -2,14 +2,17 @@ package mvcc
 
 import "sync/atomic"
 
+type DataMap map[string]VersionMap
+type VersionMap map[uint64]string
+
 type MVCC struct {
-	data   map[string]map[uint64]string
+	data   DataMap
 	commit uint64
 }
 
 func New() *MVCC {
 	return &MVCC{
-		data:   make(map[string]map[uint64]string),
+		data:   make(DataMap),
 		commit: 0,
 	}
 }
