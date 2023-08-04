@@ -1,6 +1,10 @@
 package main
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+	"time"
+)
 
 type Peer struct {
 	channel chan []byte
@@ -16,6 +20,10 @@ func (p *Peer) read() []byte {
 }
 
 func main() {
+	{
+		chanCloseButSend()
+	}
+
 	channel := make(chan []byte)
 	peer := Peer{channel: channel}
 
@@ -39,4 +47,18 @@ func main() {
 	}()
 
 	wg.Wait()
+}
+
+func chanCloseButSend() {
+	channel := make(chan struct{})
+	go func() {
+		close(channel)
+	}()
+
+	select {
+	case val := <-channel:
+		fmt.Printf("val: %v\n", val)
+	case <-time.After(time.Second):
+		fmt.Println("timeout")
+	}
 }
