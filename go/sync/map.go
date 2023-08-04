@@ -1,8 +1,11 @@
-package main
+package map_test
 
-import "sync"
+import (
+	"sync"
+	"testing"
+)
 
-func main() {
+func TestSyncMap(t *testing.T) {
 	tmp := sync.Map{}
 
 	tmp.Store("a", 1)
