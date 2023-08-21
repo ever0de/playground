@@ -3,8 +3,12 @@ name: Rust
 on:
   push:
     branches: [master]
+    paths:
+      - "rust/**"
   pull_request:
     branches: [master]
+    paths:
+      - "rust/**"
 
 jobs:
   stable:
