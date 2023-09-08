@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "ccxt_bot"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ccxt = "^4.0.78"
+click = "^8.1.7"
+loguru = "^0.7.0"
+pandas = "^2.1.0"
+python-telegram-bot = "^20.5"
+toml = "^0.10.2"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.286"
+black = "^23.7.0"
+pytest = "^7.4.2"
+
+[tool.poetry.scripts]
+start = "ccxt_bot.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
