@@ -1,2 +1,6 @@
 [telegram]
 token = ""
+
+[exchanges.binance]
+key = ""
+secret = ""
