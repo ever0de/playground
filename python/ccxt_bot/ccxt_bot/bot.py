@@ -108,6 +108,7 @@ def run_bot(token: str, exchanges: ExchangesMap):
         """
             )
 
+    # ----------Handlers----------
     app.add_handler(CommandHandler("help", help))
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("stop", stop))

@@ -43,15 +43,20 @@ class AsyncTaskMap:
             self.tasks[exchange] = {symbol: task}
 
     async def auto_delete(self, exchange: str, symbol: str, coro: asyncio.Future):
-        await coro
-
-        if exchange in self.tasks and symbol in self.tasks[exchange]:
-            del self.tasks[exchange][symbol]
-            if len(self.tasks[exchange]) == 0:
-                del self.tasks[exchange]
-            logger.info(f"deleted task: exchange: {exchange}, symbol: {symbol}")
-        else:
-            logger.warning(f"task is not found: exchange: {exchange}, symbol: {symbol}")
+        try:
+            await coro
+        except Exception as e:
+            logger.error(f"exchange: {exchange}, symbol: {symbol} tasks exception: {e}")
+        finally:
+            if exchange in self.tasks and symbol in self.tasks[exchange]:
+                del self.tasks[exchange][symbol]
+                if len(self.tasks[exchange]) == 0:
+                    del self.tasks[exchange]
+                logger.info(f"deleted task: exchange: {exchange}, symbol: {symbol}")
+            else:
+                logger.warning(
+                    f"task is not found: exchange: {exchange}, symbol: {symbol}"
+                )
 
     def get_exchanges(self) -> list[str]:
         return list(self.tasks.keys())
