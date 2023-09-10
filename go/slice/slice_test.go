@@ -2,6 +2,7 @@ package slice_test
 
 import (
 	"testing"
+	"unsafe"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -36,4 +37,8 @@ func TestSliceInStruct(t *testing.T) {
 		slice: make([]int, 3),
 	}
 	assert.NotEqual(t, a, c)
+
+	a.slice[0] = 1
+	num := (*int)(unsafe.Pointer(&a.slice[0]))
+	assert.Equal(t, 1, *num)
 }
